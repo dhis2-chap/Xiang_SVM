@@ -12,6 +12,14 @@ def get_df_per_location(csv_fn: str) -> dict:
     locations = {location: full_df[full_df['location'] == location] for location in unique_locations_list}
     return locations
 
+def fill_disease_data(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Fill NaN values in disease case data by:
+    1. Forward filling,
+    2. Backward filling,
+    3. Filling remaining NaNs with 0.
+    """
+    return df.ffill().bfill().fillna(0)
 
 def train(csv_fn, model_fn):
     models = {}
@@ -22,7 +30,7 @@ def train(csv_fn, model_fn):
         #data['data_iniSE'] = pd.to_datetime(data['data_iniSE'])
         data['time_period'] = pd.to_datetime(data['time_period'])
         data = data[['time_period', 'disease_cases']]
-        data = data.fillna(0)
+        data = fill_disease_data(data)
 
         #assert False, os.path.abspath(csv_fn)
 

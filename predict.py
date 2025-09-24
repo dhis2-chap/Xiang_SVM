@@ -13,6 +13,16 @@ def get_df_per_location(csv_fn: str) -> dict:
     locations = {location: full_df[full_df['location'] == location] for location in unique_locations_list}
     return locations
 
+def fill_disease_data(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Fill NaN values in disease case data by:
+    1. Forward filling,
+    2. Backward filling,
+    3. Filling remaining NaNs with 0.
+    """
+    return df.ffill().bfill().fillna(0)
+
+
 def predict(model_fn, historic_data_fn, future_climatedata_fn, predictions_fn):
     number_of_weeks_pred = 3
     models = joblib.load(model_fn)
@@ -26,7 +36,7 @@ def predict(model_fn, historic_data_fn, future_climatedata_fn, predictions_fn):
 
         data = locations_historic[location]
 
-        data = data.fillna(0)
+        data = fill_disease_data(data)
 
         number_data_points = data.shape[0]
 
@@ -45,6 +55,7 @@ def predict(model_fn, historic_data_fn, future_climatedata_fn, predictions_fn):
             y_pred = model.predict(X_scaled)[0]
             predictions.append(y_pred)
             X = y_pred.reshape(-1, 1)
+
 
         df['sample_0'] = np.array(predictions)
 
