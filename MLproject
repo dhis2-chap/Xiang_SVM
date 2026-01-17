@@ -1,5 +1,8 @@
 name: min_py_template
 
+min_prediction_length: 3
+max_prediction_length: 3
+
 entry_points:
   train:
     parameters:
